@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contas a Pagar</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contas a Pagar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // 🔑 Troque pelas credenciais do seu projeto Supabase
+    const supabaseUrl = "https://vhfypgmvirktufrbgjjo.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoZnlwZ212aXJrdHVmcmJnampvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNzIyMzUsImV4cCI6MjA3NDk0ODIzNX0.lVaVj1xbkEKK2tAytb5_m6X3FB0mnNzqla_kI0Fj2g4";
+    
+    // Inicialização correta usando o objeto global 'supabase' exposto pela CDN
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  </script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -269,7 +278,7 @@
 
 
         let currentEsferaFilter = 'Todos';
-        let currentStatusFilter = 'Hoje';
+        let currentStatusFilter = 'Todos';
         let currentCredorFilter = '';
         let currentCategoriaFilter = 'Todos';
         let currentTipoFilter = 'Todos';
@@ -279,20 +288,17 @@
         let lancamentos = []; // A lista agora começa vazia e será preenchida pela API
 
         const fetchLancamentos = async () => {
-            try {
-                const response = await fetch('/api/lancamentos');
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar os lançamentos');
-                }
-                const data = await response.json();
-                lancamentos = data.data;
-                popularFiltrosSelect();
-                renderizarTabela();
-            } catch (error) {
-                console.error('Falha ao buscar os dados da API:', error);
-                alert('Não foi possível carregar os dados. Verifique se o servidor está rodando.');
+            const { data, error } = await supabase.from("lancamentos").select("*");
+            if (error) {
+                console.error("Erro ao buscar:", error);
+                alert("Não foi possível carregar os dados do Supabase");
+                return;
             }
+            lancamentos = data;
+            popularFiltrosSelect();
+            renderizarTabela();
         };
+
 
         const popularFiltrosSelect = () => {
             const categorias = [...new Set(lancamentos.map(l => l.categoria))];
@@ -535,28 +541,23 @@
             };
 
             const id = lancamentoIdField.value;
-            const url = id ? `/api/lancamentos/${id}` : '/api/lancamentos';
-            const method = id ? 'PUT' : 'POST';
 
             try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(novoLancamento)
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Erro ao ${id ? 'atualizar' : 'salvar'} o lançamento.`);
+                if (id) {
+                    const { error } = await supabase.from("lancamentos").update(novoLancamento).eq("id", id);
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabase.from("lancamentos").insert([novoLancamento]);
+                    if (error) throw error;
                 }
-                
-                fetchLancamentos(); // Recarrega os dados do servidor
+
+                fetchLancamentos();
                 fecharModal();
             } catch (error) {
-                console.error('Falha na operação:', error);
-                alert(`Ocorreu um erro ao ${id ? 'atualizar' : 'salvar'}. Tente novamente.`);
+                console.error("Erro ao salvar:", error);
+                alert("Ocorreu um erro ao salvar. Tente novamente.");
             }
+
         };
         
         formImportar.onsubmit = async (e) => {
@@ -641,15 +642,13 @@
         window.confirmarExclusao = async (id) => {
             if (confirm("Tem certeza que deseja excluir este lançamento? Esta ação não pode ser desfeita.")) {
                 try {
-                    const response = await fetch(`/api/lancamentos/${id}`, {
-                        method: 'DELETE'
-                    });
-
-                    if (!response.ok) {
-                        throw new Error("Erro ao excluir o lançamento.");
+                    const { error } = await supabase.from("lancamentos").delete().eq("id", id);
+                    if (error) {
+                        alert("Erro ao excluir: " + error.message);
+                    } else {
+                        fetchLancamentos();
                     }
 
-                    fetchLancamentos(); // Recarrega os dados do servidor
                 } catch (error) {
                     console.error('Falha na exclusão:', error);
                     alert("Ocorreu um erro ao excluir o lançamento. Tente novamente.");
@@ -728,26 +727,6 @@
             renderizarTabela();
         });
 
-                // --------------------------------------------------------------------------------
-        // NOVO: Função para inicializar o estado visual dos filtros
-        // --------------------------------------------------------------------------------
-        const inicializarFiltrosVisuais = () => {
-            // 1. Esfera: Garante que o 'Todos' é o padrão visual (se não for alterado)
-            // Simula o clique no botão de esfera padrão para garantir o estilo correto
-            document.querySelector(`.esfera-btn[data-esfera="${currentEsferaFilter}"]`).click(); 
-
-            // 2. Status: Define o estado visual inicial como 'Hoje'
-            // Remove o estilo de destaque do botão 'Todos'
-            const btnTodos = document.querySelector('.status-btn[data-status="Todos"]');
-            btnTodos.classList.remove('bg-blue-600', 'text-white');
-            btnTodos.classList.add('bg-gray-200', 'hover:bg-gray-300', 'text-gray-700');
-
-            // Adiciona o estilo de destaque ao botão 'Hoje'
-            const btnHoje = document.querySelector('.status-btn[data-status="Hoje"]');
-            btnHoje.classList.add('bg-blue-600', 'text-white');
-            btnHoje.classList.remove('bg-gray-200', 'hover:bg-gray-300', 'text-gray-700');
-        };
-
         // Lógica do Tooltip (mantida do código original, já que se integra bem)
         const tooltipDelay = 2000;
         let tooltipTimer;
@@ -778,12 +757,15 @@
             }
         });
 
-        // Chamada da função de inicialização visual antes de carregar os dados
-        inicializarFiltrosVisuais(); // <<< MUDANÇA 2: Chama para acertar o visual
-
         fetchLancamentos();
+        supabase.channel("lancamentos-changes")
+            .on("postgres_changes", { event: "*", schema: "public", table: "lancamentos" }, () => {
+                fetchLancamentos();
+            })
+            .subscribe();
+
     });
 </script>
 
 </body>
-</html>
+</html>''

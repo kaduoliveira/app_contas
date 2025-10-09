@@ -522,21 +522,34 @@
 
         formLancamento.onsubmit = async (e) => {
             e.preventDefault();
+
+            // Variáveis temporárias para padronizar
+            const credorValue = document.getElementById('credor').value;
+            const categoriaValue = document.getElementById('categoria').value;
+            const tipoValue = document.getElementById('tipo').value;
+            const ondePagouValue = document.getElementById('onde_pagou').value;
+            const observacaoValue = document.getElementById('observacao').value;
             
             const novoLancamento = {
                 doc: document.getElementById('doc').value || null,
-                credor: document.getElementById('credor').value,
-                categoria: document.getElementById('categoria').value,
-                tipo: document.getElementById('tipo').value,
+
+                // PADRONIZAÇÃO PARA MAIÚSCULAS APLICADA AQUI:
+                credor: credorValue.toUpperCase(),
+                categoria: categoriaValue.toUpperCase(),
+                tipo: tipoValue.toUpperCase(),
+                
                 empresa: document.getElementById('empresa').value,
                 emissao: document.getElementById('emissao').value || null, 
                 vencimento: document.getElementById('vencimento').value,
                 valor: parseFloat(document.getElementById('valor').value),
                 data_pagt: document.getElementById('data_pagt').value || null,
                 valor_pago: parseFloat(document.getElementById('valor_pago').value) || null,
-                onde_pagou: document.getElementById('onde_pagou').value,
+                
+                // PADRONIZAÇÃO PARA MAIÚSCULAS APLICADA AQUI:
+                onde_pagou: ondePagouValue.toUpperCase(),
                 esfera: esferaDisplay.textContent,
-                observacao: document.getElementById('observacao').value,
+                observacao: observacaoValue.toUpperCase(),
+                
                 boleto: document.getElementById('boleto').checked ? 1 : 0,
             };
 

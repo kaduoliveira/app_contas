@@ -374,7 +374,7 @@
             }
             
             // Filtro por Status
-            if (currentStatusFilter !== 'Hoje') {
+            if (currentStatusFilter !== 'Todos') {
                 lancamentosFiltrados = lancamentosFiltrados.filter(l => getStatus(l) === currentStatusFilter);
             }
 
@@ -656,6 +656,20 @@
             }
         };
 
+        // Função para atualizar visualmente os botões de status
+        const updateStatusFilterButtons = (activeStatus) => {
+            statusFilterButtons.forEach(btn => {
+                const status = btn.dataset.status;
+                if (status === activeStatus) {
+                    btn.classList.remove('bg-gray-200', 'hover:bg-gray-300', 'text-gray-700');
+                    btn.classList.add('bg-blue-600', 'text-white');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('bg-gray-200', 'hover:bg-gray-300', 'text-gray-700');
+                }
+            });
+        };
+
         // Lógica dos filtros
         esferaFilterButtons.forEach(button => {
             button.addEventListener('click', () => {
@@ -775,6 +789,14 @@
         // ------------------------------------
         // Inicialização
         // ------------------------------------
+        // 1. Definir o filtro inicial
+        currentStatusFilter = 'Hoje'; 
+        
+        // 2. Definir o filtro de Esfera (mantendo 'Todos')
+        currentEsferaFilter = 'Todos'; 
+
+        // 3. Atualizar a aparência dos botões de filtro
+        updateStatusFilterButtons(currentStatusFilter);
         const today = new Date();
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0');

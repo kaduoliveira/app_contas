@@ -18,7 +18,7 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        /* Estilos específicos para o tooltip, já que o CSS puro é mais fácil aqui */
+        /* Estilos específicos para o tooltip */
         .tooltip .tooltiptext {
             visibility: hidden;
             width: 250px;
@@ -48,7 +48,6 @@
     <header class="flex justify-between items-center mb-6 border-b pb-4 border-gray-200">
         <h1 class="text-3xl font-bold text-gray-800">Contas a Pagar</h1>
         <div class="flex items-center gap-4">
-            <button id="btnImportar" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-md">Importar</button>
             <button id="btnNovo" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-md">+ Novo</button>
         </div>
     </header>
@@ -87,8 +86,8 @@
                 <option value="Todos">Tipo</option>
             </select>
             <div id="status-filters" class="flex flex-wrap gap-2">
-                <button class="status-btn px-4 py-2 rounded-lg font-semibold transition-colors border border-gray-300 bg-blue-600 text-white" data-status="Todos">Todos</button>
-                <button class="status-btn px-4 py-2 rounded-lg font-semibold transition-colors border border-gray-300 bg-gray-200 hover:bg-gray-300 text-gray-700" data-status="Hoje">Hoje</button>
+                <button class="status-btn px-4 py-2 rounded-lg font-semibold transition-colors border border-gray-300 bg-gray-200 hover:bg-gray-300 text-gray-700" data-status="Todos">Todos</button>
+                <button class="status-btn px-4 py-2 rounded-lg font-semibold transition-colors border border-gray-300 bg-blue-600 text-white" data-status="Hoje">Hoje</button>
                 <button class="status-btn px-4 py-2 rounded-lg font-semibold transition-colors border border-gray-300 bg-gray-200 hover:bg-gray-300 text-gray-700" data-status="A Vencer">A Vencer</button>
                 <button class="status-btn px-4 py-2 rounded-lg font-semibold transition-colors border border-gray-300 bg-gray-200 hover:bg-gray-300 text-gray-700" data-status="Vencido">Vencido</button>
                 <button class="status-btn px-4 py-2 rounded-lg font-semibold transition-colors border border-gray-300 bg-gray-200 hover:bg-gray-300 text-gray-700" data-status="Pago">Pago</button>
@@ -225,37 +224,14 @@
     </div>
 </div>
 
-<div id="modalImportar" class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-slate-100 p-8 rounded-lg shadow-2xl w-full max-w-xl transform transition-all scale-95 duration-300 ease-in-out">
-        <div class="flex flex-col items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Importar do Excel</h2>
-            <span class="close-btn absolute top-6 right-6 text-gray-500 hover:text-gray-800 text-3xl font-bold cursor-pointer transition-colors">&times;</span>
-        </div>
-        
-        <form id="formImportar" class="space-y-4">
-            <div class="text-center">
-                <p class="text-sm text-gray-600 mb-2">Selecione o arquivo Excel para importar. As colunas da planilha devem ser idênticas aos campos de cadastro.</p>
-                <input type="file" id="arquivoExcel" accept=".xlsx" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 transition-colors">
-            </div>
-            <div class="flex justify-end items-center gap-4 pt-4">
-                <button type="button" id="btnImportCancel" class="bg-red-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-600 transition-colors w-1/4">Cancelar</button>
-                <button type="submit" class="bg-yellow-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-yellow-700 transition-colors flex-grow">Importar Dados</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const modal = document.getElementById('modalNovoLancamento');
-        const modalImportar = document.getElementById('modalImportar');
         const btnNovo = document.getElementById('btnNovo');
-        const btnImportar = document.getElementById('btnImportar');
-        const spanClose = document.querySelector('.close-btn');
+        // Usamos querySelectorAll para cobrir o botão 'X' no modal principal
+        const closeButtons = document.querySelectorAll('.close-btn'); 
         const btnCancel = document.getElementById('btnCancel');
-        const btnImportCancel = document.getElementById('btnImportCancel');
         const formLancamento = document.getElementById('formLancamento');
-        const formImportar = document.getElementById('formImportar');
         const tabelaBody = document.querySelector('#tabelaLancamentos tbody');
         const lancamentoIdField = document.getElementById('lancamentoId');
         const modalTitle = document.getElementById('modalTitle');
@@ -278,14 +254,15 @@
 
 
         let currentEsferaFilter = 'Todos';
-        let currentStatusFilter = 'Todos';
+        // Inicializa com 'Hoje' para seguir a prática de filtro padrão
+        let currentStatusFilter = 'Hoje'; 
         let currentCredorFilter = '';
         let currentCategoriaFilter = 'Todos';
         let currentTipoFilter = 'Todos';
         let currentStartDate = null;
         let currentEndDate = null;
         
-        let lancamentos = []; // A lista agora começa vazia e será preenchida pela API
+        let lancamentos = [];
 
         const fetchLancamentos = async () => {
             const { data, error } = await supabase.from("lancamentos").select("*");
@@ -301,10 +278,10 @@
 
 
         const popularFiltrosSelect = () => {
-            const categorias = [...new Set(lancamentos.map(l => l.categoria))];
-            const tipos = [...new Set(lancamentos.map(l => l.tipo))];
+            const categorias = [...new Set(lancamentos.map(l => l.categoria).filter(Boolean))];
+            const tipos = [...new Set(lancamentos.map(l => l.tipo).filter(Boolean))];
             
-            // Popula Categoria
+            // Popula Categoria (apenas filtro principal, o campo do modal é input)
             filtroCategoria.innerHTML = '<option value="Todos">Categoria</option>';
             categorias.forEach(cat => {
                 const option = document.createElement('option');
@@ -321,6 +298,10 @@
                 option.textContent = tipo;
                 filtroTipo.appendChild(option);
             });
+            
+            // Mantém os filtros ativos após a repopulação
+            filtroCategoria.value = currentCategoriaFilter;
+            filtroTipo.value = currentTipoFilter;
         };
 
         const formatarData = (data) => {
@@ -364,11 +345,10 @@
 
         const renderizarTabela = () => {
             tabelaBody.innerHTML = '';
-            const hoje = new Date().toISOString().split('T')[0];
-
+            
             let lancamentosFiltrados = lancamentos;
 
-            // Filtro por Esfera (o primeiro a ser aplicado)
+            // Filtro por Esfera
             if (currentEsferaFilter !== 'Todos') {
                 lancamentosFiltrados = lancamentosFiltrados.filter(l => l.esfera === currentEsferaFilter);
             }
@@ -401,7 +381,6 @@
                 const end = new Date(currentEndDate);
                 lancamentosFiltrados = lancamentosFiltrados.filter(l => {
                     const vencimento = new Date(l.vencimento);
-                    // Adiciona um dia à data final para incluir o dia completo
                     const finalComum = new Date(end);
                     finalComum.setDate(finalComum.getDate() + 1); 
                     return vencimento >= start && vencimento < finalComum;
@@ -422,14 +401,14 @@
                 }
                 
                 const linha = document.createElement('tr');
-                linha.className = 'hover:bg-gray-50 transition-colors group tooltip';
+                linha.className = 'hover:bg-gray-200 transition-colors group tooltip';
                 linha.innerHTML = `
                     <td class="px-3 py-2 whitespace-nowrap text-xs text-gray-900 truncate max-w-[50px]">${lancamento.doc || ''}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-base text-gray-900 truncate max-w-[200px]">${lancamento.credor}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-600 truncate max-w-[100px]">${lancamento.categoria}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 truncate max-w-[50px]">${lancamento.empresa}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-base font-bold text-gray-900">${formatarData(lancamento.vencimento)}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-base text-gray-900">${formatarMoeda(lancamento.valor)}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-base font-bold text-gray-900 max-w-[60px]">${formatarData(lancamento.vencimento)}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-base text-gray-900 max-w-[60px]">${formatarMoeda(lancamento.valor)}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-base text-center">
                         ${lancamento.boleto ? `
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -472,17 +451,6 @@
             esferaDisplay.textContent = ''; // Limpa o display da esfera
         };
 
-        const abrirModalImportar = () => {
-            modalImportar.classList.remove('hidden');
-            modalImportar.querySelector('div').classList.add('scale-100');
-        };
-
-        const fecharModalImportar = () => {
-            modalImportar.querySelector('div').classList.remove('scale-100');
-            modalImportar.classList.add('hidden');
-            formImportar.reset();
-        };
-
         btnNovo.onclick = () => {
             modalTitle.textContent = 'Novo Lançamento';
             lancamentoIdField.value = '';
@@ -490,22 +458,16 @@
             abrirModal();
         };
 
-        btnImportar.onclick = () => {
-            abrirModalImportar();
-        };
-
-        spanClose.onclick = () => {
-            fecharModal();
-            fecharModalImportar();
-        };
+        // Eventos para fechar o modal
+        closeButtons.forEach(btn => {
+            btn.onclick = fecharModal;
+        });
 
         btnCancel.onclick = fecharModal;
-        btnImportCancel.onclick = fecharModalImportar;
+        
         window.onclick = (event) => {
             if (event.target === modal) {
                 fecharModal();
-            } else if (event.target === modalImportar) {
-                fecharModalImportar();
             }
         };
 
@@ -533,7 +495,7 @@
             const novoLancamento = {
                 doc: document.getElementById('doc').value || null,
 
-                // PADRONIZAÇÃO PARA MAIÚSCULAS APLICADA AQUI:
+                // PADRONIZAÇÃO PARA MAIÚSCULAS APLICADA
                 credor: credorValue.toUpperCase(),
                 categoria: categoriaValue.toUpperCase(),
                 tipo: tipoValue.toUpperCase(),
@@ -545,7 +507,7 @@
                 data_pagt: document.getElementById('data_pagt').value || null,
                 valor_pago: parseFloat(document.getElementById('valor_pago').value) || null,
                 
-                // PADRONIZAÇÃO PARA MAIÚSCULAS APLICADA AQUI:
+                // PADRONIZAÇÃO PARA MAIÚSCULAS APLICADA
                 onde_pagou: ondePagouValue.toUpperCase(),
                 esfera: esferaDisplay.textContent,
                 observacao: observacaoValue.toUpperCase(),
@@ -573,46 +535,7 @@
 
         };
         
-        formImportar.onsubmit = async (e) => {
-            e.preventDefault();
-            const arquivoInput = document.getElementById('arquivoExcel');
-            const file = arquivoInput.files[0];
-
-            if (!file) {
-                alert('Por favor, selecione um arquivo Excel.');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('excelFile', file);
-
-            try {
-                const response = await fetch('/api/importar-lancamentos', {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Erro desconhecido ao importar.');
-                }
-
-                const result = await response.json();
-                alert(result.message);
-                if (result.falhas && result.falhas.length > 0) {
-                    let mensagemFalhas = "Algumas linhas não foram importadas devido a erros:\n";
-                    result.falhas.forEach(f => {
-                        mensagemFalhas += `Linha ${f.linha}: ${f.erro}\n`;
-                    });
-                    alert(mensagemFalhas);
-                }
-                fecharModalImportar();
-                fetchLancamentos(); // Recarrega os dados da tabela
-            } catch (error) {
-                console.error('Erro na importação:', error);
-                alert(`Ocorreu um erro na importação: ${error.message}`);
-            }
-        };
+        // Lógica formImportar.onsubmit removida
 
         window.marcarComoPago = (id) => {
             const lancamento = lancamentos.find(l => l.id === id);
@@ -627,7 +550,7 @@
                 lancamentoIdField.value = lancamento.id;
                 document.getElementById('doc').value = lancamento.doc;
                 document.getElementById('categoria').value = lancamento.categoria;
-                document.getElementById('tipo').value = lancamento.tipo; // Esta linha garante que o campo Tipo seja preenchido
+                document.getElementById('tipo').value = lancamento.tipo; 
                 document.getElementById('credor').value = lancamento.credor;
                 document.getElementById('empresa').value = lancamento.empresa;
                 esferaDisplay.textContent = lancamento.esfera;
@@ -669,7 +592,21 @@
             }
         };
 
-        // Função para atualizar visualmente os botões de status
+        // Função para atualizar visualmente os botões de Esfera
+        const updateEsferaFilterButtons = (activeEsfera) => {
+            esferaFilterButtons.forEach(btn => {
+                const esfera = btn.dataset.esfera;
+                if (esfera === activeEsfera) {
+                    btn.classList.add('bg-slate-700', 'text-white');
+                    btn.classList.remove('border-slate-700', 'hover:bg-slate-200', 'text-slate-700');
+                } else {
+                    btn.classList.remove('bg-slate-700', 'text-white');
+                    btn.classList.add('border-slate-700', 'hover:bg-slate-200', 'text-slate-700');
+                }
+            });
+        };
+
+        // Função para atualizar visualmente os botões de Status
         const updateStatusFilterButtons = (activeStatus) => {
             statusFilterButtons.forEach(btn => {
                 const status = btn.dataset.status;
@@ -687,12 +624,7 @@
         esferaFilterButtons.forEach(button => {
             button.addEventListener('click', () => {
                 currentEsferaFilter = button.dataset.esfera;
-                esferaFilterButtons.forEach(btn => {
-                    btn.classList.remove('bg-slate-700', 'text-white');
-                    btn.classList.add('border-slate-700', 'hover:bg-slate-200', 'text-slate-700');
-                });
-                button.classList.add('bg-slate-700', 'text-white');
-                button.classList.remove('border-slate-700', 'hover:bg-slate-200', 'text-slate-700');
+                updateEsferaFilterButtons(currentEsferaFilter);
                 renderizarTabela();
             });
         });
@@ -700,12 +632,7 @@
         statusFilterButtons.forEach(button => {
             button.addEventListener('click', () => {
                 currentStatusFilter = button.dataset.status;
-                statusFilterButtons.forEach(btn => {
-                    btn.classList.remove('bg-blue-600', 'text-white');
-                    btn.classList.add('bg-gray-200', 'hover:bg-gray-300', 'text-gray-700');
-                });
-                button.classList.add('bg-blue-600', 'text-white');
-                button.classList.remove('bg-gray-200', 'hover:bg-gray-300', 'text-gray-700');
+                updateStatusFilterButtons(currentStatusFilter);
                 renderizarTabela();
             });
         });
@@ -754,15 +681,7 @@
             renderizarTabela();
         });
 
-        // Função para inicializar o estado visual dos filtros (Tailwind)
-        const inicializarFiltrosVisuais = () => {
-            // Esfera: 'Todos' ativo
-            updateEsferaFilterButtons('Todos');
-            // Status: 'Hoje' ativo
-            updateStatusFilterButtons('Hoje');
-        };
-
-        // Lógica do Tooltip (mantida do código original, já que se integra bem)
+        // Lógica do Tooltip (mantida)
         const tooltipDelay = 2000;
         let tooltipTimer;
         
@@ -792,35 +711,26 @@
             }
         });
 
+        // ------------------------------------
+        // Inicialização
+        // ------------------------------------
+        // 1. O filtro 'Hoje' é o padrão (currentStatusFilter = 'Hoje')
+        // 2. O filtro 'Todos' da esfera é o padrão (currentEsferaFilter = 'Todos')
+        updateStatusFilterButtons(currentStatusFilter);
+        updateEsferaFilterButtons(currentEsferaFilter);
+        
+        // 3. Carregar os dados (chama popularFiltrosSelect e renderizarTabela)
         fetchLancamentos();
+        
+        // 4. Lógica de tempo real do Supabase
         supabase.channel("lancamentos-changes")
             .on("postgres_changes", { event: "*", schema: "public", table: "lancamentos" }, () => {
                 fetchLancamentos();
             })
             .subscribe();
-        
-        // ------------------------------------
-        // Inicialização
-        // ------------------------------------
-        // 1. Definir o filtro inicial
-        currentStatusFilter = 'Hoje'; 
-        
-        // 2. Definir o filtro de Esfera (mantendo 'Todos')
-        currentEsferaFilter = 'Todos'; 
-
-        // 3. Atualizar a aparência dos botões de filtro
-        updateStatusFilterButtons(currentStatusFilter);
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        mesReferenciaInput.value = `${yyyy}-${mm}`;
-        currentMesReferencia = `${yyyy}-${mm}`;
-
-        inicializarFiltrosVisuais(); 
-        fetchLancamentos();
 
     });
 </script>
 
 </body>
-</html>''
+</html>

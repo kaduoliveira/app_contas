@@ -425,7 +425,7 @@
                     
                     <div class="hidden md:table-cell md:p-3 whitespace-nowrap text-xs text-gray-900 truncate max-w-[50px]">${lancamento.doc || ''}</div>
 
-                    <div class="font-bold text-lg md:text-base md:table-cell md:p-3 whitespace-nowrap text-gray-900 truncate max-w-[200px]">
+                    <div class="font-semibold text-lg md:text-base md:table-cell md:p-3 whitespace-nowrap text-gray-900 truncate max-w-[200px]">
                         ${lancamento.credor}
                         <span class="md:hidden text-xs font-normal text-gray-500 block">${lancamento.categoria} - ${lancamento.empresa}</span>
                     </div>
@@ -439,7 +439,7 @@
                         <span>${formatarData(lancamento.vencimento)}</span>
                     </div>
 
-                    <div class="md:table-cell md:p-3 whitespace-nowrap text-lg md:text-base text-gray-900 font-extrabold max-w-[60px] flex justify-between items-center">
+                    <div class="md:table-cell md:p-3 whitespace-nowrap text-lg md:text-base text-gray-900 font-semibold max-w-[60px] flex justify-between items-center">
                         <span class="md:hidden text-sm font-semibold text-gray-600">Valor:</span>
                         <span>${formatarMoeda(lancamento.valor)}</span>
                     </div>

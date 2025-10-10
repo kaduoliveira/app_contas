@@ -40,6 +40,18 @@
             visibility: visible;
             opacity: 1;
         }
+        
+        /* Custom CSS para garantir que as células se comportem como table-cell apenas em MD */
+        .grid-row-like {
+            display: grid;
+            grid-template-columns: 1fr; /* Default: Card mode */
+        }
+
+        @media (min-width: 768px) {
+            .grid-row-like {
+                display: table-row; /* Desktop: Table mode */
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 p-8">
@@ -105,12 +117,12 @@
 
     <div class="overflow-x-auto">
         <table id="tabelaLancamentos" class="min-w-full divide-y divide-gray-500">
-            <thead class="bg-gray-300">
+            <thead class="hidden md:table-header-group bg-gray-300">
                 <tr>
-                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider max-w-[60px] overflow-hidden">DOC.</th>
+                    <th class="hidden md:table-cell px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider max-w-[60px] overflow-hidden">DOC.</th>
                     <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider min-w-[120px]">Credor</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">Categoria</th>
-                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Empresa</th>
+                    <th class="hidden md:table-cell px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">Categoria</th>
+                    <th class="hidden md:table-cell px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Empresa</th>
                     <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider font-bold">Vencimento</th>
                     <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider max-w-[60px] overflow-hidden">Valor</th>
                     <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider max-w-[40px] overflow-hidden">Boleto</th>
@@ -118,14 +130,14 @@
                     <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Ações</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-300">
-                </tbody>
+            <tbody id="tabela-corpo-cards" class="md:table-row-group bg-white divide-y divide-gray-300 flex flex-col gap-4 md:gap-0">
+            </tbody>
         </table>
     </div>
 </div>
 
-<div id="modalNovoLancamento" class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-slate-400 p-8 rounded-lg shadow-2xl w-full max-w-3xl transform transition-all scale-95 duration-300 ease-in-out">
+<div id="modalNovoLancamento" class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm z-50 flex justify-center items-start overflow-y-auto p-4 hidden">
+    <div class="bg-slate-400 p-4 sm:p-8 rounded-lg shadow-2xl w-full max-w-lg md:max-w-3xl mt-8 mb-8 transform transition-all scale-95 duration-300 ease-in-out">
         <div class="flex flex-col items-center mb-6">
             <h2 id="modalTitle" class="text-2xl font-bold text-gray-800">Novo Lançamento</h2>
             <span id="esfera" class="text-xs font-bold uppercase mt-2 px-4 py-1 rounded-full bg-slate-700 text-white"></span>
@@ -232,7 +244,8 @@
         const closeButtons = document.querySelectorAll('.close-btn'); 
         const btnCancel = document.getElementById('btnCancel');
         const formLancamento = document.getElementById('formLancamento');
-        const tabelaBody = document.querySelector('#tabelaLancamentos tbody');
+        // Alterado para 'tabela-corpo-cards'
+        const tabelaBody = document.getElementById('tabela-corpo-cards'); 
         const lancamentoIdField = document.getElementById('lancamentoId');
         const modalTitle = document.getElementById('modalTitle');
         const empresaSelect = document.getElementById('empresa');
@@ -392,33 +405,60 @@
             lancamentosFiltrados.forEach(lancamento => {
                 const status = getStatus(lancamento);
                 let statusClass = 'text-blue-600 font-semibold';
+                let statusBgClass = 'bg-blue-100';
                 if (status === 'Pago') {
                     statusClass = 'text-green-600 font-semibold';
+                    statusBgClass = 'bg-green-100';
                 } else if (status === 'Hoje') {
-                    statusClass = 'text-yellow-600 font-semibold';
+                    statusClass = 'text-yellow-700 font-semibold';
+                    statusBgClass = 'bg-yellow-100';
                 } else if (status === 'Vencido') {
                     statusClass = 'text-red-600 font-semibold';
+                    statusBgClass = 'bg-red-100';
                 }
                 
-                const linha = document.createElement('tr');
-                linha.className = 'hover:bg-gray-200 transition-colors group tooltip';
+                // Usando uma div que se transforma em linha da tabela em md:
+                const linha = document.createElement('div');
+                linha.className = 'grid-row-like bg-white p-4 md:p-0 rounded-lg shadow-md md:shadow-none md:hover:bg-gray-200 transition-all group tooltip border-l-4 border-gray-400 md:border-l-0';
+                
                 linha.innerHTML = `
-                    <td class="px-3 py-2 whitespace-nowrap text-xs text-gray-900 truncate max-w-[50px]">${lancamento.doc || ''}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-base text-gray-900 truncate max-w-[200px]">${lancamento.credor}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-600 truncate max-w-[100px]">${lancamento.categoria}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 truncate max-w-[50px]">${lancamento.empresa}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-base font-bold text-gray-900 max-w-[60px]">${formatarData(lancamento.vencimento)}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-base text-gray-900 max-w-[60px]">${formatarMoeda(lancamento.valor)}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-base text-center">
+                    
+                    <div class="hidden md:table-cell md:p-3 whitespace-nowrap text-xs text-gray-900 truncate max-w-[50px]">${lancamento.doc || ''}</div>
+
+                    <div class="font-bold text-lg md:text-base md:table-cell md:p-3 whitespace-nowrap text-gray-900 truncate max-w-[200px]">
+                        ${lancamento.credor}
+                        <span class="md:hidden text-xs font-normal text-gray-500 block">${lancamento.categoria} - ${lancamento.empresa}</span>
+                    </div>
+
+                    <div class="hidden md:table-cell md:p-3 whitespace-nowrap text-sm text-gray-600 truncate max-w-[100px]">${lancamento.categoria}</div>
+
+                    <div class="hidden md:table-cell md:p-3 whitespace-nowrap text-sm text-gray-900 truncate max-w-[50px]">${lancamento.empresa}</div>
+                    
+                    <div class="md:table-cell md:p-3 whitespace-nowrap text-base font-bold text-gray-900 max-w-[60px] flex justify-between items-center">
+                        <span class="md:hidden text-sm font-semibold text-gray-600">Vencimento:</span>
+                        <span>${formatarData(lancamento.vencimento)}</span>
+                    </div>
+
+                    <div class="md:table-cell md:p-3 whitespace-nowrap text-lg md:text-base text-gray-900 font-extrabold max-w-[60px] flex justify-between items-center">
+                        <span class="md:hidden text-sm font-semibold text-gray-600">Valor:</span>
+                        <span>${formatarMoeda(lancamento.valor)}</span>
+                    </div>
+                    
+                    <div class="md:table-cell md:p-3 whitespace-nowrap text-base text-center hidden md:block">
                         ${lancamento.boleto ? `
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
                         ` : ''}
-                    </td>
-                    <td class="px-3 py-2 whitespace-nowrap text-base ${statusClass}">${status}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-base font-medium">
-                        <div class="flex items-center space-x-2">
+                    </div>
+                    
+                    <div class="md:table-cell md:p-3 whitespace-nowrap text-base ${statusClass} flex justify-between items-center">
+                        <span class="md:hidden text-sm font-semibold text-gray-600">Status:</span>
+                        <span class="px-2 py-1 rounded-full text-xs ${statusBgClass} ${statusClass}">${status}</span>
+                    </div>
+
+                    <div class="md:table-cell md:p-3 whitespace-nowrap text-base font-medium pt-4 md:pt-0">
+                        <div class="flex items-center space-x-2 justify-end md:justify-start">
                             <button class="text-blue-600 hover:text-blue-900" onclick="abrirFormularioParaEditar(${lancamento.id})" title="Editar">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                             </button>
@@ -431,7 +471,7 @@
                             </button>
                             ` : ''}
                         </div>
-                    </td>
+                    </div>
                     <span class="tooltiptext">${lancamento.observacao || 'Nenhuma observação'}</span>
                 `;
                 tabelaBody.appendChild(linha);
@@ -681,16 +721,17 @@
             renderizarTabela();
         });
 
-        // Lógica do Tooltip (mantida)
+        // Lógica do Tooltip (ajustada para funcionar em divs/cards)
         const tooltipDelay = 2000;
         let tooltipTimer;
         
         tabelaBody.addEventListener('mouseover', (e) => {
-            const row = e.target.closest('tr');
-            if (row) {
+            // Busca o elemento mais próximo que tem a classe 'group tooltip' (o card)
+            const card = e.target.closest('.group.tooltip'); 
+            if (card) {
                 clearTimeout(tooltipTimer);
                 tooltipTimer = setTimeout(() => {
-                    const tooltip = row.querySelector('.tooltiptext');
+                    const tooltip = card.querySelector('.tooltiptext');
                     if (tooltip) {
                         tooltip.style.visibility = 'visible';
                         tooltip.style.opacity = '1';
@@ -700,10 +741,10 @@
         });
         
         tabelaBody.addEventListener('mouseout', (e) => {
-            const row = e.target.closest('tr');
-            if (row) {
+            const card = e.target.closest('.group.tooltip');
+            if (card) {
                 clearTimeout(tooltipTimer);
-                const tooltip = row.querySelector('.tooltiptext');
+                const tooltip = card.querySelector('.tooltiptext');
                 if (tooltip) {
                     tooltip.style.visibility = 'hidden';
                     tooltip.style.opacity = '0';

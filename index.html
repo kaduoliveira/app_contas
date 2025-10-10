@@ -60,8 +60,7 @@
     <header class="flex justify-between items-center mb-6 border-b pb-4 border-gray-200">
         <h1 class="text-3xl font-bold text-gray-800">Contas a Pagar</h1>
         <div class="flex items-center gap-4">
-            <button id="btnNovo" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-md">+ Novo</button>
-        </div>
+            </div>
     </header>
 
     <div id="esfera-filters" class="flex justify-start gap-4 mb-6">
@@ -137,35 +136,37 @@
 </div>
 
 <div id="modalNovoLancamento" class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm z-50 flex justify-center items-start overflow-y-auto p-4 hidden">
-    <div class="bg-slate-400 p-4 sm:p-8 rounded-lg shadow-2xl w-full max-w-lg md:max-w-3xl mt-8 mb-8 transform transition-all scale-95 duration-300 ease-in-out">
-        <div class="flex flex-col items-center mb-6">
-            <h2 id="modalTitle" class="text-2xl font-bold text-gray-800">Novo Lançamento</h2>
-            <span id="esfera" class="text-xs font-bold uppercase mt-2 px-4 py-1 rounded-full bg-slate-700 text-white"></span>
-            <span class="close-btn absolute top-6 right-6 text-gray-500 hover:text-gray-800 text-3xl font-bold cursor-pointer transition-colors">&times;</span>
+    <div class="bg-gray-300 p-4 sm:p-8 rounded-xl shadow-2xl w-full max-w-lg md:max-w-3xl mt-8 mb-8 transform transition-all scale-95 duration-300 ease-in-out">
+        <div class="flex justify-between items-center mb-4 border-b pb-3 border-gray-200">
+            <div class="flex flex-col">
+                <h2 id="modalTitle" class="text-2xl font-bold text-gray-800">Novo Lançamento</h2>
+                <span id="esfera" class="text-xs font-bold uppercase mt-1 px-3 py-0.5 rounded-full bg-slate-700 text-white w-min"></span>
+            </div>
+            <span class="close-btn text-gray-500 hover:text-gray-800 text-3xl font-bold cursor-pointer transition-colors">&times;</span>
         </div>
         
-        <form id="formLancamento" class="space-y-4">
+        <form id="formLancamento" class="space-y-6">
             <input type="hidden" id="lancamentoId">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="col-span-1">
                     <label for="doc" class="block text-sm font-medium text-gray-700">DOC</label>
-                    <input type="text" id="doc" class="mt-1 block w-full text-base rounded-md bg-white border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                    <input type="text" id="doc" class="mt-1 block w-full text-base rounded-lg bg-gray-50 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                 </div>
-                <div class="col-span-1 md:col-span-1 lg:col-span-2">
+                <div class="col-span-1 md:col-span-2">
                     <label for="credor" class="block text-sm font-medium text-gray-700">Credor<span class="text-red-500">*</span></label>
-                    <input type="text" id="credor" required class="mt-1 block w-full text-base rounded-md bg-white border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                    <input type="text" id="credor" required class="mt-1 block w-full text-base rounded-lg bg-gray-50 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                     <label for="categoria" class="block text-sm font-medium text-gray-700">Categoria<span class="text-red-500">*</span></label>
-                    <input type="text" id="categoria" required class="mt-1 block w-full text-base rounded-md bg-white border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                    <input type="text" id="categoria" required class="mt-1 block w-full text-base rounded-lg bg-gray-50 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                 </div>
                 <div>
                     <label for="tipo" class="block text-sm font-medium text-gray-700">Tipo<span class="text-red-500">*</span></label>
-                    <select id="tipo" required class="mt-1 block w-full text-base rounded-md bg-white border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                    <select id="tipo" required class="mt-1 block w-full text-base rounded-lg bg-gray-50 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                         <option value="">Selecione...</option>
                         <option value="CUSTO FIXO">Custo Fixo</option>
                         <option value="CUSTO VARIAVEL">Custo Variável</option>
@@ -177,7 +178,7 @@
                 </div>
                 <div>
                     <label for="empresa" class="block text-sm font-medium text-gray-700">Empresa<span class="text-red-500">*</span></label>
-                    <select id="empresa" required class="mt-1 block w-full text-base rounded-md bg-white border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                    <select id="empresa" required class="mt-1 block w-full text-base rounded-lg bg-gray-50 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                         <option value="">Selecione...</option>
                         <option value="FOX">FOX</option>
                         <option value="S.OLIVEIRA">S.OLIVEIRA</option>
@@ -192,34 +193,34 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                     <label for="emissao" class="block text-sm font-medium text-gray-700">Emissão</label>
-                    <input type="date" id="emissao" class="mt-1 block w-full text-base rounded-md bg-white border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                    <input type="date" id="emissao" class="mt-1 block w-full text-base rounded-lg bg-gray-50 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                 </div>
                 <div>
                     <label for="vencimento" class="block text-sm font-medium text-gray-700">Vencimento<span class="text-red-500">*</span></label>
-                    <input type="date" id="vencimento" required class="mt-1 block w-full text-base rounded-md bg-white border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                    <input type="date" id="vencimento" required class="mt-1 block w-full text-base rounded-lg bg-gray-50 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                 </div>
                 <div>
                     <label for="valor" class="block text-sm font-medium text-gray-700">Valor<span class="text-red-500">*</span></label>
-                    <input type="number" id="valor" step="0.01" required class="mt-1 block w-full text-base rounded-md bg-white border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                    <input type="number" id="valor" step="0.01" required class="mt-1 block w-full text-base rounded-lg bg-gray-50 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                 </div>
             </div>
             <div>
                 <label for="observacao" class="block text-sm font-medium text-gray-700">Observação</label>
-                <textarea id="observacao" rows="1" class="mt-1 block w-full text-base rounded-md bg-white border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors"></textarea>
+                <textarea id="observacao" rows="2" class="mt-1 block w-full text-base rounded-lg bg-gray-50 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors"></textarea>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2 border-t border-gray-200">
                 <div>
                     <label for="data_pagt" class="block text-sm font-medium text-gray-700">Data Pagamento</label>
-                    <input type="date" id="data_pagt" class="mt-1 block w-full text-base rounded-md bg-white border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                    <input type="date" id="data_pagt" class="mt-1 block w-full text-base rounded-lg bg-gray-50 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                 </div>
                 <div>
                     <label for="valor_pago" class="block text-sm font-medium text-gray-700">Valor Pago</label>
-                    <input type="number" id="valor_pago" step="0.01" class="mt-1 block w-full text-base rounded-md bg-white border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                    <input type="number" id="valor_pago" step="0.01" class="mt-1 block w-full text-base rounded-lg bg-gray-50 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                 </div>
                 <div>
                     <label for="onde_pagou" class="block text-sm font-medium text-gray-700">Onde Pagou</label>
-                    <input type="text" id="onde_pagou" class="mt-1 block w-full text-base rounded-md bg-white border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                    <input type="text" id="onde_pagou" class="mt-1 block w-full text-base rounded-lg bg-gray-50 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                 </div>
             </div>
             
@@ -228,13 +229,17 @@
                 <label for="boleto" class="ml-2 block text-base font-medium text-gray-700">Boleto Recebido</label>
             </div>
             
-            <div class="flex justify-end items-center gap-4 pt-4">
+            <div class="flex justify-end items-center gap-4 pt-4 border-t border-gray-200">
                 <button type="button" id="btnCancel" class="bg-red-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-600 transition-colors w-1/4">Cancelar</button>
                 <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors flex-grow">Salvar</button>
             </div>
         </form>
     </div>
 </div>
+
+<button id="btnNovo" aria-label="Novo Lançamento" class="fixed bottom-6 right-6 z-40 bg-blue-600 hover:bg-green-700 text-white font-bold p-4 rounded-full transition-shadow duration-300 shadow-xl hover:shadow-2xl">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+</button>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
